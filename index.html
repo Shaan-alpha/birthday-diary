@@ -221,15 +221,19 @@ h1.title span {
 .scroll-hint {
   position: absolute;
   bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  text-align: center;
   font-size: 11px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.4);
   z-index: 2;
   opacity: 0;
-  animation: fadeUp 1s ease 2s forwards;
+  animation: fadeIn 1s ease 2s forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
 }
 .scroll-hint::after {
   content: '';
@@ -559,10 +563,14 @@ h1.title span {
 ========================= */
 @media (max-width: 768px) {
   .diary-book { aspect-ratio: 3 / 4; max-height: none; }
-  .page-face { padding: 36px 28px; }
-  .chapter-title { font-size: 28px; margin-bottom: 20px; }
-  .chapter-body { font-size: 14px; line-height: 1.7; }
-  .chapter-illustration { width: 50px; height: 50px; top: 24px; right: 24px; }
+  .page-face { padding: 32px 24px; }
+  .chapter-title { font-size: 24px; margin-bottom: 16px; }
+  .chapter-body { font-size: 13px; line-height: 1.65; }
+  .chapter-illustration { width: 44px; height: 44px; top: 20px; right: 20px; }
+  .chapter-date { font-size: 14px; }
+  .cover-title { font-size: clamp(36px, 10vw, 64px); }
+  .end-title { font-size: clamp(28px, 8vw, 44px); }
+  .end-message { font-size: 14px; }
 }
 
 /* =========================
@@ -619,7 +627,9 @@ h1.title span {
 @media (max-width: 900px) {
   .memory-card.wide, .memory-card.tall, .memory-card.mid, .memory-card.sm {
     grid-column: span 12;
+    min-height: 200px;
   }
+  .memory-grid { gap: 14px; }
 }
 
 .memory-emoji {
@@ -837,6 +847,35 @@ footer em {
   transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* =========================
+   MOBILE LAYOUT
+========================= */
+@media (max-width: 768px) {
+  .diary-section { padding: 80px 20px; }
+  .memories { padding: 80px 20px; }
+  .wish-section { padding: 80px 20px; }
+  .section-header { margin-bottom: 48px; }
+  .section-header p { font-size: 15px; }
+  .wish-card { padding: 48px 24px; border-radius: 24px; }
+  .wish-message { font-size: 15px; }
+  .wish-actions { flex-direction: column; align-items: center; }
+  .insta-link, .cake-btn { width: 100%; justify-content: center; }
+  .book-controls { gap: 14px; margin-top: 24px; }
+  .book-btn { width: 44px; height: 44px; }
+  footer { padding: 40px 20px 28px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  nav { gap: 10px; padding: 8px 14px; font-size: 10px; top: 10px; }
+  nav .logo { font-size: 13px; padding-right: 8px; }
+  .hero { padding: 0 16px; }
+  .diary-section, .memories, .wish-section { padding: 64px 16px; }
+  .wish-card { padding: 36px 18px; }
+  .memory-card { padding: 24px; }
+  .memory-emoji { font-size: 28px; margin-bottom: 12px; }
+  .memory-card h3 { font-size: 20px; }
+}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
