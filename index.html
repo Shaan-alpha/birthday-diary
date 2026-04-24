@@ -242,11 +242,12 @@ h1.title span {
   height: 40px;
   background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent);
   margin: 12px auto 0;
+  transform-origin: top center;
   animation: scrollLine 2s ease-in-out infinite;
 }
 @keyframes scrollLine {
-  0%, 100% { transform: scaleY(1); transform-origin: top; }
-  50% { transform: scaleY(0.3); transform-origin: top; }
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.3); }
 }
 
 @keyframes fadeUp {
@@ -637,6 +638,8 @@ h1.title span {
   margin-bottom: 16px;
   display: inline-block;
   filter: drop-shadow(0 4px 20px rgba(255,163,81,0.3));
+  position: relative;
+  z-index: 1;
 }
 .memory-card h3 {
   font-family: 'Fraunces', serif;
@@ -941,12 +944,17 @@ footer em {
 @media (max-width: 480px) {
   nav { gap: 10px; padding: 8px 14px; font-size: 10px; top: 10px; }
   nav .logo { font-size: 13px; padding-right: 8px; }
-  .hero { padding: 0 16px; }
+  .hero { padding: 80px 16px 100px; }
   .diary-section, .memories, .wish-section { padding: 64px 16px; }
   .wish-card { padding: 36px 18px; }
   .memory-card { padding: 24px; }
   .memory-emoji { font-size: 28px; margin-bottom: 12px; }
   .memory-card h3 { font-size: 20px; }
+}
+
+@media (max-width: 360px) {
+  nav .logo { display: none; }
+  nav { gap: 16px; }
 }
 
 /* Reduced motion */
