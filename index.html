@@ -849,6 +849,78 @@ footer em {
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
 /* =========================
+   BLOB PARALLAX LAYER
+========================= */
+.blob-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+/* =========================
+   MUSIC PLAYER
+========================= */
+.music-player {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 200;
+}
+.music-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(14,14,22,0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+  z-index: 2;
+}
+.music-btn:hover {
+  background: rgba(255,107,157,0.25);
+  border-color: rgba(255,107,157,0.5);
+  transform: scale(1.1);
+}
+.music-btn .icon-pause { display: none; }
+.music-player.playing .icon-music { display: none; }
+.music-player.playing .icon-pause { display: block; }
+.music-rings {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.music-rings span {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,107,157,0.35);
+  opacity: 0;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0.6);
+}
+.music-rings span:nth-child(1) { width: 64px; height: 64px; }
+.music-rings span:nth-child(2) { width: 88px; height: 88px; }
+.music-rings span:nth-child(3) { width: 116px; height: 116px; }
+.music-player.playing .music-rings span {
+  animation: musicPulse 2.4s ease-out infinite;
+}
+.music-player.playing .music-rings span:nth-child(2) { animation-delay: 0.5s; }
+.music-player.playing .music-rings span:nth-child(3) { animation-delay: 1s; }
+@keyframes musicPulse {
+  0%   { opacity: 0.7; transform: translate(-50%,-50%) scale(0.6); }
+  100% { opacity: 0;   transform: translate(-50%,-50%) scale(1.1); }
+}
+
+/* =========================
    MOBILE LAYOUT
 ========================= */
 @media (max-width: 768px) {
@@ -902,9 +974,9 @@ footer em {
 
 <!-- Hero -->
 <section class="hero">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
+  <div class="blob-layer" data-depth="0.035"><div class="blob blob-1"></div></div>
+  <div class="blob-layer" data-depth="0.018"><div class="blob blob-2"></div></div>
+  <div class="blob-layer" data-depth="0.055"><div class="blob blob-3"></div></div>
 
   <div class="hero-content">
     <div class="kicker">A handmade birthday diary</div>
@@ -1210,6 +1282,22 @@ footer em {
   </div>
 </section>
 
+<!-- Music Player -->
+<div class="music-player" id="musicPlayer">
+  <audio id="bgMusic" loop preload="none">
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+  <div class="music-rings"><span></span><span></span><span></span></div>
+  <button class="music-btn" id="musicBtn" aria-label="Toggle music">
+    <svg class="icon-music" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+    </svg>
+    <svg class="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+    </svg>
+  </button>
+</div>
+
 <footer>
   Made with <em>love</em> by your little one · <span id="year"></span>
 </footer>
@@ -1388,6 +1476,77 @@ footer em {
 
   // Auto burst once when hero finishes loading
   setTimeout(burst, 2800);
+})();
+
+/* =========================
+   BLOB PARALLAX
+========================= */
+(function() {
+  var layers = Array.prototype.slice.call(document.querySelectorAll('.blob-layer'));
+  if (!layers.length) return;
+
+  var targets = layers.map(function() { return {x:0, y:0}; });
+  var current = layers.map(function() { return {x:0, y:0}; });
+
+  (function tick() {
+    layers.forEach(function(layer, i) {
+      current[i].x += (targets[i].x - current[i].x) * 0.05;
+      current[i].y += (targets[i].y - current[i].y) * 0.05;
+      layer.style.transform = 'translate(' + current[i].x.toFixed(2) + 'px,' + current[i].y.toFixed(2) + 'px)';
+    });
+    requestAnimationFrame(tick);
+  })();
+
+  if (!window.matchMedia('(hover: none)').matches) {
+    var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    window.addEventListener('resize', function() { cx = window.innerWidth/2; cy = window.innerHeight/2; });
+    window.addEventListener('mousemove', function(e) {
+      var dx = e.clientX - cx, dy = e.clientY - cy;
+      layers.forEach(function(layer, i) {
+        var d = parseFloat(layer.dataset.depth) || 0.03;
+        targets[i].x = dx * d * 18;
+        targets[i].y = dy * d * 18;
+      });
+    });
+  } else if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', function(e) {
+      layers.forEach(function(layer, i) {
+        var d = parseFloat(layer.dataset.depth) || 0.03;
+        targets[i].x = (e.gamma || 0) * d * 14;
+        targets[i].y = ((e.beta || 0) - 30) * d * 10;
+      });
+    });
+  }
+})();
+
+/* =========================
+   MUSIC PLAYER
+========================= */
+(function() {
+  var player = document.getElementById('musicPlayer');
+  var btn    = document.getElementById('musicBtn');
+  var audio  = document.getElementById('bgMusic');
+  var on = false;
+
+  btn.addEventListener('click', function() {
+    if (on) {
+      audio.pause();
+      player.classList.remove('playing');
+      on = false;
+    } else {
+      audio.volume = 0.35;
+      var p = audio.play();
+      if (p) {
+        p.then(function() {
+          player.classList.add('playing');
+          on = true;
+        }).catch(function(){});
+      } else {
+        player.classList.add('playing');
+        on = true;
+      }
+    }
+  });
 })();
 
 /* =========================
